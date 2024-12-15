@@ -1,0 +1,352 @@
+Basic Queries
+
+1.Select all columns from the Employee table..
+
+select * From Employee
+
+2. Select only name and salary columns from the Employee table.
+
+select name,salary From Employee
+
+3. Select employees who are older than 30.
+
+select name From Employee
+where age>30
+
+select * From Employee
+where age>30
+
+4. Select the names of all  departments.
+
+select name From Department
+
+5. Select employees who work in the IT department.
+
+select * From Employee,Department
+where Employee.department_id = Department.department_id and Department.name = 'IT'
+
+
+
+String Matching Queries:
+
+6. Select Employess whose names start with 'J'.
+
+select * From Employee where name like 'J%';
+
+7. Select Employees whose names end with 'e'.
+
+select * From Employee where name like '%e';
+
+8. Select employees whose names contain 'a'.
+
+select * From Employee where name like '%a%';
+
+9.Select employess whose names are exactly 9 characyers long.
+
+select * From Employee where name like '_________';
+
+10. Select employees whose names have 'o' as the second character.
+
+select * From Employee where name like '_o%';
+
+
+
+Date Queries:
+
+11. Select employess hired in the year 2020.
+
+select * From Employee
+where to_char(hire_date,'YYYY') = '2020';
+
+select * From Employee
+where year(hire_date) = 2020;
+
+12. Select employees hired in January of any year.
+
+select * From Employee
+where month(hire_date) = '01';
+
+select * From Employee where to_char(hire_date,'MM') = '01';
+
+13. Select employees hired before 2019.
+
+select * from Employee where year(hire_date) < 2019;
+
+14. Select employees hired on or after March 1, 2021.
+
+select * From Employee where hire_date >= '2021-03-01';
+
+--select current_date();
+15. Select employees hired in the last 2 years.
+
+select * From Employee where DATEDIFF(year, hire_date, Getdate()) = 2
+
+select * From Employee where hire_date >= CURRENT_DATE()- INTERVAL '5 YEAR';
+
+
+
+Aggregate Queries:
+
+16. Select the total salary of all employees.
+
+select sum(salary) from Employee
+
+17. Select the average salary of employees.
+
+select avg(salary) from Employee
+
+18. Select the minimum salary in the Employee table.
+
+select min(salary) from Employee
+
+19. Select the number of Employees in each departmet
+
+select department_id, count(*) from Employee
+group by department_id
+
+20. Select the average salary of employees in each department.
+
+select department_id,avg(salary) as  averagesal from Employee 
+group by department_id;
+
+
+
+Group by queries:
+
+
+21. Select the total salary for each department.
+
+select department_id,sum(salary) from Employee
+group by department_id;
+
+22. Select the average age of employees on each departmemnt.
+
+select department_id,avg(age) from Employee
+group by department_id;
+
+23.Select the number of Employees hired in each year.
+
+select year(hire_date), count(*) from Employee
+group by year(hire_date)
+
+24. Select the highest salary in each department.
+
+select department_id, max(salary) as max_salary
+from Employee
+group by department_id;
+
+25. Select the department with the highest average salary.
+
+select d.name,avg(e.salary) as avg_salary
+from Employee e, Department d
+where e.department_id = d.department_id
+group by d.name
+order by avg_salary desc
+limit 1;
+
+
+Having Queries:
+
+
+26. Select departments with more than 2 employees.
+
+select name from Department
+where department_id in(
+    select department_id from Employee
+    group by department_id
+    having count(emp_id) > 2
+);
+
+
+
+27. Select deparments with an average salary greater than 55000.
+
+select name from Department
+where department_id in(
+    select department_id from Employee
+    group by department_id
+    having avg(salary) >  55000
+);
+
+
+28. Select years with more than 1 employeee hired.
+
+select year(hire_date) from employee
+group by year(hire_date)
+having count(emp_id) > 1
+
+29. Select departments with a total salary expense less than 100000.
+
+select name from Department
+where department_id in(
+    select department_id from Employee
+    group by department_id
+    having sum(salary) < 100000
+);
+
+30. Select departments with the maximum salary above 75000.
+
+select name from Department
+where department_id in(
+    select department_id from Employee
+    group by department_id
+    having max(salary) > 75000
+);
+
+
+
+Order By Queries:
+
+31. Select all employees ordered by their salary in ascending order.
+
+select * from Employee
+order by salary asc
+
+32. Select all employees ordered by their age in descending order
+
+select * from Employee
+order by age desc
+
+33. Select employees ordered by their hire date in ascending order
+
+select * from Employee
+order by hire_date asc
+
+34. Select employees ordered by their department and then by their salary.
+
+select * from Employee
+order by department_id asc, salary asc
+
+35. Select departments ordered by the total salary of their employees.
+
+select name from Department
+where department_id in (
+    select department_id from Employee
+    group by department_id
+    order by sum(salary)
+);
+
+
+
+
+36. Select employee names along with their department names
+
+select e.name as emp_name, d.name as dept_name
+from Employee e
+join Department d on e.department_id = d.department_id
+
+37. Select names along with the department names they belong to.
+
+select e.name as emp_name, d.name as dept_name
+from Employee e
+join Department d on e.department_id = d.department_id
+
+38. Select employee names and their corresponding project names.
+
+select e.name as emp_name, p.name as project_name
+from Employee e
+join Project p on e.department_id = p.department_id
+
+39. Select employees and their departments, including those without a department.
+
+select e.name as emp_name, d.name as dept_name
+from Employee e
+left join Department d on e.department_id = d.department_id
+
+40. Select all departments and their employees, including departments without employees.
+
+select  d.name, e.name
+from Department d
+left join Employee e on d.department_id = e.department_id
+
+41. Select employees who are not assigned to any project.
+
+select e.name and p.name
+from Employee e
+left join Project p on e.department_id = p.department_id
+where p.project_id is null;
+
+
+42. Selct employees and the number of projects their departments is working on.
+
+select e.name as emp_name, count(p.project_id) as num_projects
+from Employee e
+left join Project p on e.department_id = p.department_id
+group by e.name
+
+
+43. Select the departments that have no employees.
+
+select d.name
+from Department d
+left join Employee e on e.department_id = d.department_id
+where e.name is null;
+
+44. Select employee named who share the sam department with 'John Doe'.
+
+select e.name from Employee e
+join Employee j on e.department_id = j.department_id
+where j.name = 'John Doe';
+
+45. Select the department name with the highest average salary.
+
+select d.name, avg(e.salary) as avg_salary
+from Department d
+join Employee e on e.department_id = d.department_id
+group by d.name
+order by avg(salary) desc
+limit 1;
+
+
+Nested and Correlated Queries:
+
+46. Select the Employee with the highest salary.
+
+select name from Employee
+where salary =(
+    select max(salary) from Employee
+);
+
+47. Select employees whose salary is above the average salary.
+
+select name from Employee
+where salary >(
+    select avg(salary) from Employee
+)
+
+48. Select the second highest salary from the Employee table.
+
+select max(salary) from Employee
+where salary not in(
+    select max(salary) from Employee
+)
+
+49. Select the department with the most employees
+
+select name from Department
+where department_id =(
+    select department_id from Employee
+    group by department_id
+    order by count(emp_id) desc
+    limit 1
+)
+
+50. Select employees who can earn more than the average salary of their department.
+
+select name from Employee
+where salary > (
+    select avg(salary) from Employee e
+    where e.department_id = Employee.department_id
+)
+
+
+
+
+
+
+
+
+
+
+
+
